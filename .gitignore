@@ -1,0 +1,36 @@
+# Maven build output
+target/
+
+# Java compiled files and crash logs
+*.class
+hs_err_pid*
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*credentials*
+*secret*
+*password*
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.swp
+*~
+
+# Database dumps and backups
+*.dump
+*.backup
+*.bak
+*.sql.gz
