@@ -13,7 +13,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Java 25 LTS -->
+    <!-- Java 17 LTS -->
     <maven.compiler.release>17</maven.compiler.release>
     <!-- Main class used by exec:java -->
     <exec.mainClass>com.library.Main</exec.mainClass>
@@ -63,7 +63,7 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.3.1</version>
         </plugin>
-        <!-- Compiler locked to Java 25 -->
+        <!-- Compiler locked to Java 17 -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
