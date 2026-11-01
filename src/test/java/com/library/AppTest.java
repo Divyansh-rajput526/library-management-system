@@ -5,18 +5,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the Book model.
- *
- * These tests run without a database — they only test Java logic in Book.java.
- * Integration tests (tests that actually talk to PostgreSQL) would require a
- * running database and are not included here; test those manually with
- * `mvn exec:java` after setting up the DB.
+ * Unit tests for domain models and report records.
  */
 public class AppTest {
 
-    // -------------------------------------------------------------------------
-    // Constructor and basic getters
-    // -------------------------------------------------------------------------
+    // --- Book tests ---
 
     @Test
     public void newBookShouldStoreTitle() {
@@ -32,7 +25,6 @@ public class AppTest {
 
     @Test
     public void newBookAvailableCopiesEqualsTotal() {
-        // When a book is added fresh, all copies should be available.
         Book book = new Book("Effective Java", "Joshua Bloch", "9780134685991", 5);
         assertEquals(5, book.getAvailableCopies(),
                 "A brand-new book should have all copies available");
@@ -40,17 +32,12 @@ public class AppTest {
 
     @Test
     public void dbConstructorShouldSetAllFields() {
-        // This constructor is used when reading a row back from the database.
         Book book = new Book(42, "The Pragmatic Programmer", "Hunt & Thomas",
                 "9780135957059", 4, 2);
         assertEquals(42, book.getId());
         assertEquals(4, book.getTotalCopies());
         assertEquals(2, book.getAvailableCopies());
     }
-
-    // -------------------------------------------------------------------------
-    // toString
-    // -------------------------------------------------------------------------
 
     @Test
     public void toStringShouldContainTitle() {
@@ -62,14 +49,9 @@ public class AppTest {
     @Test
     public void toStringShouldContainAvailability() {
         Book book = new Book(1, "Design Patterns", "GoF", "9780201633610", 3, 1);
-        // Format is "Available: 1/3"
         assertTrue(book.toString().contains("1/3"),
                 "toString() should show availableCopies/totalCopies");
     }
-
-    // -------------------------------------------------------------------------
-    // Setters
-    // -------------------------------------------------------------------------
 
     @Test
     public void setterShouldUpdateTitle() {
@@ -85,23 +67,14 @@ public class AppTest {
         assertEquals(3, book.getAvailableCopies());
     }
 
-    // -------------------------------------------------------------------------
-    // Null ISBN
-    // -------------------------------------------------------------------------
-
     @Test
     public void bookWithNullIsbnShouldNotThrow() {
-        // ISBN is optional in the schema; Book must accept null gracefully.
         Book book = new Book("No ISBN Book", "Some Author", null, 1);
         assertNull(book.getIsbn());
-        // toString() must also work when isbn is null
         assertNotNull(book.toString());
     }
 
-    // =========================================================================
-    // Member model tests  (Phase 3)
-    // All tests run without a database — only Member.java logic is tested.
-    // =========================================================================
+    // --- Member tests ---
 
     @Test
     public void newMemberShouldStoreName() {
@@ -117,14 +90,12 @@ public class AppTest {
 
     @Test
     public void newMemberIdShouldBeZeroBeforeInsert() {
-        // The 3-arg constructor is used before INSERT; id is 0 until the DB assigns it.
         Member m = new Member("Bob", "bob@example.com", null);
         assertEquals(0, m.getId());
     }
 
     @Test
     public void fullMemberConstructorShouldSetAllFields() {
-        // The 5-arg constructor is used when reading a row back from the database.
         LocalDate date = LocalDate.of(2024, 6, 15);
         Member m = new Member(7, "Carol", "carol@example.com", "1234567890", date);
         assertEquals(7, m.getId());
@@ -136,10 +107,9 @@ public class AppTest {
 
     @Test
     public void memberWithNullPhoneShouldNotThrow() {
-        // Phone is optional in the schema; Member must accept null gracefully.
         Member m = new Member("Dave", "dave@example.com", null);
         assertNull(m.getPhone());
-        assertNotNull(m.toString());   // toString() must handle null phone
+        assertNotNull(m.toString());
     }
 
     @Test
@@ -165,10 +135,7 @@ public class AppTest {
                 "toString() should show N/A when phone is null");
     }
 
-    // =========================================================================
-    // Issue model tests (Phase 4)
-    // All tests run without a database — only Issue.java logic is tested.
-    // =========================================================================
+    // --- Issue tests ---
 
     @Test
     public void newIssueShouldStoreBookAndMemberId() {
@@ -218,9 +185,7 @@ public class AppTest {
                 "toString() should indicate return date");
     }
 
-    // =========================================================================
-    // Report record unit tests (Phase 5)
-    // =========================================================================
+    // --- Report record tests ---
 
     @Test
     public void activeLoanRecordShouldHoldFields() {

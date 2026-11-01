@@ -17,6 +17,9 @@ A beginner-friendly Java console application demonstrating **OOP**, **JDBC**, an
 library-management-system/
 ├── pom.xml                                   ← dependencies & build config
 ├── schema.sql                                ← creates books / members / issues tables
+├── .env.example                              ← template for database environment variables
+├── run.sh                                    ← helper script to validate env and launch app
+├── test.sh                                   ← helper script to run tests and report status
 ├── src/main/java/com/library/
 │   ├── Main.java     ← console menu + user input
 │   ├── Library.java  ← JDBC connection + transaction-safe SQL operations
@@ -55,26 +58,55 @@ You should see `Schema applied successfully.` at the end.
 
 The app reads credentials from environment variables — **no passwords in source code**.
 
+Create a `.env` file in the project root (you can copy `.env.example`):
 ```bash
-# macOS / Linux — run in the same terminal you will use for mvn exec:java
-export DB_HOST=localhost    # optional, default: localhost
-export DB_PORT=5432         # optional, default: 5432
-export DB_NAME=library_db
-export DB_USER=library_user
-export DB_PASS=your_password
+cp .env.example .env
 ```
 
-> **Tip:** Add those `export` lines to `~/.zshrc` so they persist across sessions.
+Edit `.env` with your database credentials:
+```ini
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=library_db
+DB_USER=library_user
+DB_PASS=your_password
+```
+
+> **Note:** `.env` is listed in `.gitignore` and is never committed to Git.
 
 ---
 
-## Running the Application
+## Running and Testing the Application
+
+### Using Helper Scripts (macOS)
+
+Make sure the scripts are executable:
+```bash
+chmod +x run.sh test.sh
+```
+
+1. **Run tests:**
+   ```bash
+   ./test.sh
+   ```
+   Runs `mvn clean test`, prints a clear summary of test results, and preserves Maven's exit code.
+
+2. **Launch the console application:**
+   ```bash
+   ./run.sh
+   ```
+   `./run.sh` automatically loads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASS` from `.env` (while preserving any variables already explicitly set in your terminal), validates prerequisites, and starts the application.
+
+### Using Maven Directly
 
 ```bash
-# Compile + run unit tests (no DB required):
+# Compile and run unit tests (no DB required):
 mvn clean test
 
-# Run the interactive console app (DB must be running + env vars must be set):
+# Run all tests including live PostgreSQL integration tests:
+DB_NAME=library_db DB_USER=library_user DB_PASS=your_password mvn test
+
+# Run the interactive console app (DB must be running + env vars set):
 mvn exec:java
 ```
 

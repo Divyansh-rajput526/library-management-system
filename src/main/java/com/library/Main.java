@@ -5,22 +5,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Application entry point — Phase 3: Book + Member Management.
- *
- * Design rule (separation of concerns):
- *   Main   — reads user input, prints output, drives the menu loop.
- *   Library — executes all SQL; Main never touches a Connection directly.
- *   Book / Member — hold data only; no SQL, no I/O.
- *
- * The menu is split into two numbered sections so options are easy to remember:
- *   1–5  Book management   (Phase 2, unchanged)
- *   6–9  Member management (Phase 3, new)
- *     0  Exit
- */
+
 public class Main {
 
-    // One Scanner for the whole application; shared across all static methods.
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -28,10 +15,7 @@ public class Main {
         System.out.println("║   Library Management System      ║");
         System.out.println("╚══════════════════════════════════╝");
 
-        // try-with-resources ensures Library.close() is always called,
-        // even when an exception is thrown.
         try (Library library = new Library()) {
-
             library.testConnection();
 
             boolean running = true;
@@ -40,41 +24,36 @@ public class Main {
                 int choice = readInt("Enter choice: ");
 
                 switch (choice) {
-                    // ── Book management (Phase 2) ──────────────────────────
+                    // Books
                     case 1 -> addBook(library);
                     case 2 -> listBooks(library);
                     case 3 -> searchBooks(library);
                     case 4 -> findBookById(library);
                     case 5 -> deleteBook(library);
 
-                    // ── Member management (Phase 3) ────────────────────────
+                    // Members
                     case 6 -> addMember(library);
                     case 7 -> listMembers(library);
                     case 8 -> findMember(library);
                     case 9 -> findMemberByEmail(library);
 
-                    // ── Circulation / Loans (Phase 4) ──────────────────────
+                    // Circulation
                     case 10 -> issueBook(library);
                     case 11 -> returnBook(library);
 
-                    // ── Reports & Statistics (Phase 5) ─────────────────────
+                    // Reports
                     case 12 -> showReportsMenu(library);
 
                     case 0 -> running = false;
                     default -> System.out.println("  Invalid option. Please try again.");
                 }
             }
-
         } catch (Exception e) {
             System.err.println("\nError: " + e.getMessage());
         }
 
         System.out.println("Goodbye!");
     }
-
-    // =========================================================================
-    // Menu
-    // =========================================================================
 
     private static void printMenu() {
         System.out.println();
@@ -99,11 +78,8 @@ public class Main {
         System.out.println("─────────────────────────────────────");
     }
 
-    // =========================================================================
-    // Book management handlers  (Phase 2 — code unchanged)
-    // =========================================================================
+    // --- Book handlers ---
 
-    /** Option 1 — Add a book. */
     private static void addBook(Library library) {
         System.out.println("\n-- Add New Book --");
 
@@ -127,7 +103,6 @@ public class Main {
         }
     }
 
-    /** Option 2 — List every book in the catalogue. */
     private static void listBooks(Library library) {
         System.out.println("\n-- All Books --");
         try {
@@ -142,7 +117,6 @@ public class Main {
         }
     }
 
-    /** Option 3 — Search by title keyword. */
     private static void searchBooks(Library library) {
         System.out.println("\n-- Search Books by Title --");
         String keyword = readNonBlank("Keyword: ");
@@ -160,7 +134,6 @@ public class Main {
         }
     }
 
-    /** Option 4 — Look up one book by its primary key. */
     private static void findBookById(Library library) {
         System.out.println("\n-- Find Book by ID --");
         int id = readInt("Book ID: ");
@@ -177,7 +150,6 @@ public class Main {
         }
     }
 
-    /** Option 5 — Delete a book (blocked if the book has borrowing history). */
     private static void deleteBook(Library library) {
         System.out.println("\n-- Delete Book --");
         int id = readInt("Book ID to delete: ");
@@ -209,18 +181,14 @@ public class Main {
         }
     }
 
-    // =========================================================================
-    // Member management handlers  (Phase 3 — new)
-    // =========================================================================
+    // --- Member handlers ---
 
-    /** Option 6 — Register a new library member. */
     private static void addMember(Library library) {
         System.out.println("\n-- Register New Member --");
 
         String name  = readNonBlank("Name          : ");
         String email = readNonBlank("Email         : ");
 
-        // Phone is optional; the user can press Enter to skip it.
         System.out.print("Phone (optional, press Enter to skip): ");
         String phone = scanner.nextLine().trim();
 
@@ -228,13 +196,10 @@ public class Main {
             int newId = library.addMember(name, email, phone);
             System.out.println("  ✔ Member registered successfully with ID = " + newId);
         } catch (SQLException e) {
-            // Library.addMember() already produces a friendly message for
-            // duplicate emails (SQLState 23505).
             System.out.println("  ✘ " + e.getMessage());
         }
     }
 
-    /** Option 7 — Print all registered members. */
     private static void listMembers(Library library) {
         System.out.println("\n-- All Members --");
         try {
@@ -249,7 +214,6 @@ public class Main {
         }
     }
 
-    /** Option 8 — Look up a member by their primary key. */
     private static void findMember(Library library) {
         System.out.println("\n-- Find Member by ID --");
         int id = readInt("Member ID: ");
@@ -266,7 +230,6 @@ public class Main {
         }
     }
 
-    /** Option 9 — Look up a member by email address. */
     private static void findMemberByEmail(Library library) {
         System.out.println("\n-- Find Member by Email --");
         String email = readNonBlank("Email: ");
@@ -283,11 +246,8 @@ public class Main {
         }
     }
 
-    // =========================================================================
-    // Circulation handlers (Phase 4 — new)
-    // =========================================================================
+    // --- Circulation handlers ---
 
-    /** Option 10 — Issue a book to a member. */
     private static void issueBook(Library library) {
         System.out.println("\n-- Issue a Book --");
         int bookId   = readPositiveInt("Book ID   : ");
@@ -303,7 +263,6 @@ public class Main {
         }
     }
 
-    /** Option 11 — Return an issued book using issue ID. */
     private static void returnBook(Library library) {
         System.out.println("\n-- Return an Issued Book --");
         int issueId = readPositiveInt("Issue ID to return: ");
@@ -317,11 +276,8 @@ public class Main {
         }
     }
 
-    // =========================================================================
-    // Reports & Statistics (Phase 5 — new)
-    // =========================================================================
+    // --- Reports handlers ---
 
-    /** Option 12 — Reports Submenu loop. */
     private static void showReportsMenu(Library library) {
         boolean inReports = true;
         while (inReports) {
@@ -349,7 +305,6 @@ public class Main {
         }
     }
 
-    /** Report 1 — All currently active / unreturned loans. */
     private static void reportCurrentlyIssuedBooks(Library library) {
         System.out.println("\n-- Report 1: All Currently Issued Books --");
         try {
@@ -377,7 +332,6 @@ public class Main {
         }
     }
 
-    /** Report 2 — Complete borrowing history for a specific member. */
     private static void reportMemberBorrowingHistory(Library library) {
         System.out.println("\n-- Report 2: Member Borrowing History --");
         int memberId = readPositiveInt("Enter Member ID: ");
@@ -413,7 +367,6 @@ public class Main {
         }
     }
 
-    /** Report 3 — Books that currently have copies available on the shelf. */
     private static void reportAvailableBooks(Library library) {
         System.out.println("\n-- Report 3: Available Books in Stock --");
         try {
@@ -429,7 +382,6 @@ public class Main {
         }
     }
 
-    /** Report 4 — Rank books by number of times borrowed. */
     private static void reportMostBorrowedBooks(Library library) {
         System.out.println("\n-- Report 4: Most Borrowed Books Ranking --");
         try {
@@ -453,7 +405,6 @@ public class Main {
         }
     }
 
-    /** Report 5 — High-level library summary statistics. */
     private static void reportSummaryStatistics(Library library) {
         System.out.println("\n-- Report 5: Library Summary Statistics --");
         try {
@@ -472,17 +423,13 @@ public class Main {
         }
     }
 
-    /** Truncates text with an ellipsis if it exceeds maxLen. */
     private static String truncate(String text, int maxLen) {
         if (text == null) return "N/A";
         return text.length() <= maxLen ? text : text.substring(0, maxLen - 3) + "...";
     }
 
-    // =========================================================================
-    // Input helpers — reused by both book and member handlers
-    // =========================================================================
+    // --- Input helpers ---
 
-    /** Reads an integer from the keyboard. Re-prompts on bad input. */
     private static int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -495,7 +442,6 @@ public class Main {
         }
     }
 
-    /** Reads a positive integer (>= 1). Re-prompts on bad input. */
     private static int readPositiveInt(String prompt) {
         while (true) {
             int value = readInt(prompt);
@@ -504,7 +450,6 @@ public class Main {
         }
     }
 
-    /** Reads a non-blank string. Re-prompts if the user just presses Enter. */
     private static String readNonBlank(String prompt) {
         while (true) {
             System.out.print(prompt);

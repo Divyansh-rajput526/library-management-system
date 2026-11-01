@@ -6,10 +6,8 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Integration tests executed against a live PostgreSQL database.
- *
- * These tests are only enabled when the DB_NAME environment variable is provided.
- * When DB_NAME is not set, JUnit 5 cleanly skips them so offline builds pass.
+ * Integration tests against a live PostgreSQL database.
+ * Enabled when the DB_NAME environment variable is set.
  */
 @EnabledIfEnvironmentVariable(named = "DB_NAME", matches = ".+")
 public class LibraryIntegrationTest {
